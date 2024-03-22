@@ -30,13 +30,13 @@ public class ProductService {
 
             var exists = existsId(dto.id());
 
-            if (exists.equals(true)){
+            if (exists.equals(true)) {
                 throw new ConflictException("Produto ja existe");
             }
 
             return mapper.toDto(productRepository.save(mapper.toEntity(dto)));
 
-        }catch (ConflictException e){
+        } catch (ConflictException e) {
             throw new ConflictException(e.getMessage());
 
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class ProductService {
 
             return mapper.toDto(entity);
 
-        }catch (UnprocessableEntityException e){
+        } catch (UnprocessableEntityException e) {
             throw new UnprocessableEntityException(e.getMessage());
 
         } catch (Exception e) {
@@ -74,14 +74,13 @@ public class ProductService {
         try {
             var entity = existsId(id);
 
-            if (entity.equals(false)){
+            if (entity.equals(false)) {
                 throw new UnprocessableEntityException("Produto não existe");
-            }
-            else {
+            } else {
                 productRepository.deleteById(id);
             }
 
-        }catch (UnprocessableEntityException e){
+        } catch (UnprocessableEntityException e) {
             throw new UnprocessableEntityException(e.getMessage());
 
         } catch (Exception e) {
@@ -97,7 +96,7 @@ public class ProductService {
 
             return mapper.toDto(productRepository.save(mapper.toEntityUpdate(entity, dto)));
 
-        }catch (UnprocessableEntityException e){
+        } catch (UnprocessableEntityException e) {
             throw new UnprocessableEntityException(e.getMessage());
 
         } catch (Exception e) {
