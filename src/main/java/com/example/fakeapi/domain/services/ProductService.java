@@ -1,13 +1,14 @@
 package com.example.fakeapi.domain.services;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.example.fakeapi.api.dto.ProductsDTO;
 import com.example.fakeapi.domain.entities.Product;
 import com.example.fakeapi.domain.repositories.ProductRepository;
-import com.sun.source.tree.TryTree;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductsMapper mapper;
 
-    public void deleteAll(){
+    public void deleteAll() {
         productRepository.deleteAll();
     }
 
@@ -57,16 +58,17 @@ public class ProductService {
     public ProductsDTO updateProduct(String id, ProductsDTO dto) {
 
         try {
-            Product entity = productRepository.findById(id).orElseThrow( () -> new RuntimeException("Error in updateProduct"));
+            Product entity = productRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Error in updateProduct"));
             System.out.println(entity.getTitle());
-            return mapper.toDto( productRepository.save( mapper.toEntityUpdate(entity, dto)));
+            return mapper.toDto(productRepository.save(mapper.toEntityUpdate(entity, dto)));
         } catch (Exception e) {
             throw new RuntimeException("Error in updateProduct: " + e);
         }
 
     }
 
-    public Boolean existsId(String id){
-       return productRepository.existsById(id);
+    public Boolean existsId(String id) {
+        return productRepository.existsById(id);
     }
 }
