@@ -2,6 +2,7 @@ package com.example.fakeapi.domain.services;
 
 import com.example.fakeapi.api.dto.ProductsDTO;
 import com.example.fakeapi.infrastructure.FakeApiClient;
+import com.example.fakeapi.infrastructure.exceptions.ConflictException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +23,18 @@ public class FakeApiService {
                         Boolean response = productService.existsId(product.id());
                         if (response.equals(false)) {
                             productService.saveProductsInBase(product);
+                        } else {
+                            throw new ConflictException("Produto ja existe no banco de dados");
                         }
                     }
-
             );
             return productService.searchAllProducts();
+
+        } catch (ConflictException e) {
+            throw new ConflictException(e.getMessage());
+
         } catch (Exception e) {
-            throw new RuntimeException("Error searchProductsInApi: "+e);
+            throw new RuntimeException("Error searchProductsInApi: " + e);
         }
     }
 }

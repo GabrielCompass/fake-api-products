@@ -1,12 +1,16 @@
 package com.example.fakeapi.domain.services;
 
 import java.util.List;
+import java.util.Objects;
 
+import com.example.fakeapi.infrastructure.exceptions.ConflictException;
+import com.example.fakeapi.infrastructure.exceptions.UnprocessableEntityException;
 import org.springframework.stereotype.Service;
 
 import com.example.fakeapi.api.dto.ProductsDTO;
 import com.example.fakeapi.domain.entities.Product;
 import com.example.fakeapi.domain.repositories.ProductRepository;
+import com.example.fakeapi.infrastructure.exceptions.BusinessException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,11 +27,20 @@ public class ProductService {
 
     public ProductsDTO saveProductsInBase(ProductsDTO dto) {
         try {
-            var entity = mapper.toEntity(dto);
-            var response = productRepository.save(entity);
-            return mapper.toDto(response);
+
+            var exists = existsId(dto.id());
+
+            if (exists.equals(true)) {
+                throw new ConflictException("Produto ja existe");
+            }
+
+            return mapper.toDto(productRepository.save(mapper.toEntity(dto)));
+
+        } catch (ConflictException e) {
+            throw new ConflictException(e.getMessage());
+
         } catch (Exception e) {
-            throw new RuntimeException("Error in saveProductsInBase: " + e);
+            throw new BusinessException("Erro: salvar produtos: " + e);
         }
     }
 
@@ -35,23 +48,43 @@ public class ProductService {
         try {
             return mapper.toListDto(productRepository.findAll());
         } catch (Exception e) {
-            throw new RuntimeException("Error in searchAllProducts: " + e);
+            throw new BusinessException("Erro: buscar todo os produtos: " + e);
         }
     }
 
     public ProductsDTO searchProductByTitle(String title) {
         try {
-            return mapper.toDto(productRepository.findByTitle(title));
+            var entity = productRepository.findByTitle(title);
+
+            if (Objects.isNull(entity)) {
+                throw new UnprocessableEntityException("Não foram encontrados produtos com esse nome");
+            }
+
+            return mapper.toDto(entity);
+
+        } catch (UnprocessableEntityException e) {
+            throw new UnprocessableEntityException(e.getMessage());
+
         } catch (Exception e) {
-            throw new RuntimeException("Error in searchProductByTitle: " + e);
+            throw new BusinessException("Erro: buscar produtos por titulo" + e);
         }
     }
 
     public void deleteProductById(String id) {
         try {
-            productRepository.deleteById(id);
+            var entity = existsId(id);
+
+            if (entity.equals(false)) {
+                throw new UnprocessableEntityException("Produto não existe");
+            } else {
+                productRepository.deleteById(id);
+            }
+
+        } catch (UnprocessableEntityException e) {
+            throw new UnprocessableEntityException(e.getMessage());
+
         } catch (Exception e) {
-            throw new RuntimeException("Error in deleteProductById: " + e);
+            throw new BusinessException("Erro: deletar por id " + e);
         }
     }
 
@@ -59,11 +92,15 @@ public class ProductService {
 
         try {
             Product entity = productRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Error in updateProduct"));
-            System.out.println(entity.getTitle());
+                    .orElseThrow(() -> new UnprocessableEntityException("Produto não existe"));
+
             return mapper.toDto(productRepository.save(mapper.toEntityUpdate(entity, dto)));
+
+        } catch (UnprocessableEntityException e) {
+            throw new UnprocessableEntityException(e.getMessage());
+
         } catch (Exception e) {
-            throw new RuntimeException("Error in updateProduct: " + e);
+            throw new BusinessException("Erro: ao atualizar produto " + e);
         }
 
     }
