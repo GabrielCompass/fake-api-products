@@ -7,12 +7,11 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class ProductsMapper {
 
-    public Product toEntity(ProductsDTO dto){
+    public Product toEntity(ProductsDTO dto) {
         return new Product(
                 dto.id(),
                 dto.title(),
@@ -20,11 +19,10 @@ public class ProductsMapper {
                 dto.category(),
                 dto.description(),
                 dto.image(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
-    public ProductsDTO toDto(Product entity){
+    public ProductsDTO toDto(Product entity) {
         return new ProductsDTO(
                 entity.getId(),
                 entity.getTitle(),
@@ -33,11 +31,10 @@ public class ProductsMapper {
                 entity.getDescription(),
                 entity.getImage(),
                 entity.getCreatedAt(),
-                entity.getUpdateAt()
-        );
+                entity.getUpdateAt());
     }
 
-    public Product toEntityUpdate(Product entity, ProductsDTO dto){
+    public Product toEntityUpdate(Product entity, ProductsDTO dto) {
         String title = (dto.title() != null) ? dto.title() : entity.getTitle();
 
         BigDecimal price = (dto.price() != null) ? dto.price() : entity.getPrice();
@@ -56,11 +53,10 @@ public class ProductsMapper {
                 description,
                 image,
                 entity.getCreatedAt(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
-    public List<ProductsDTO> toListDto(List<Product> entityList){
+    public List<ProductsDTO> toListDto(List<Product> entityList) {
         return entityList.stream().map(this::toDto).toList();
     }
 }
