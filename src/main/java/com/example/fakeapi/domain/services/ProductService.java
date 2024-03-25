@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.example.fakeapi.infrastructure.exceptions.ConflictException;
 import com.example.fakeapi.infrastructure.exceptions.UnprocessableEntityException;
+import com.example.fakeapi.infrastructure.message.producer.FakeApiProducer;
 import org.springframework.stereotype.Service;
 
 import com.example.fakeapi.api.dto.ProductsDTO;
@@ -20,15 +21,20 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductsMapper mapper;
+    private final FakeApiProducer fakeApiProducer;
 
-    public void deleteAll() {
-        productRepository.deleteAll();
+    public Boolean existsByTitle(String title) {
+        try {
+            return productRepository.existsByTitle(title);
+        }catch (Exception e) {
+            throw new BusinessException("Erro ao buscar produto por titulo");
+        }
     }
 
     public ProductsDTO saveProductsInBase(ProductsDTO dto) {
         try {
 
-            var exists = existsId(dto.id());
+            var exists = existsByTitle(dto.title());
 
             if (exists.equals(true)) {
                 throw new ConflictException("Produto ja existe");
@@ -40,6 +46,29 @@ public class ProductService {
             throw new ConflictException(e.getMessage());
 
         } catch (Exception e) {
+            throw new BusinessException("Erro: salvar produtos: " + e);
+        }
+    }
+
+    public void saveProductsConsumer(ProductsDTO dto) {
+        try {
+
+            var exists = existsByTitle(dto.title());
+
+            if (exists.equals(true)){
+                fakeApiProducer.sendResponseProducts("Produto" +dto.title() +" ja existe");
+                throw new ConflictException("Produto ja existe");
+            }
+
+            productRepository.save(mapper.toEntity(dto));
+
+            fakeApiProducer.sendResponseProducts("Produto "+ dto.title() +" sucesso");
+
+        }catch (ConflictException e){
+            throw new ConflictException(e.getMessage());
+
+        } catch (Exception e) {
+            fakeApiProducer.sendResponseProducts("Erro ao cadastrar produto "+ dto.title());
             throw new BusinessException("Erro: salvar produtos: " + e);
         }
     }
@@ -107,5 +136,9 @@ public class ProductService {
 
     public Boolean existsId(String id) {
         return productRepository.existsById(id);
+    }
+
+    public void deleteAll() {
+        productRepository.deleteAll();
     }
 }

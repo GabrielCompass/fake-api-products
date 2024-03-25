@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/shop
+
+fake-api:
+  url: http://fakestoreapi.com
+
+topic:
+  fake:
+    api:
+      consumer:
+        name: fake-api-consumer-products-v4
+        group:
+          id: default
+      producer:
+        name: fake-api-producer-products-v4
