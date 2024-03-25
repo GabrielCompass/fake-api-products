@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         return response(ex.getMessage(), request, HttpStatus.CONFLICT, LocalDateTime.now());
     }
 
-    private ResponseEntity<ErrorResponse> response(String message, HttpServletRequest request, HttpStatus status, LocalDateTime date){
+    private ResponseEntity<ErrorResponse> response(String message, HttpServletRequest request, HttpStatus status, LocalDateTime date) {
         return ResponseEntity
                 .status(status)
                 .body(new ErrorResponse(message, date, status.value(), request.getRequestURI()));
