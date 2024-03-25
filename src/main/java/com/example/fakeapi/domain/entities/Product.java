@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 public class Product {
 
     @Id
-    private String id;
+    private String id = UUID.randomUUID().toString();
 
     private String title;
     private BigDecimal price;
@@ -30,8 +31,7 @@ public class Product {
     private LocalDateTime updateAt;
 
 
-    public Product(String id, String title, BigDecimal price, String category, String description, String image, LocalDateTime createdAt) {
-        this.id = id;
+    public Product( String title, BigDecimal price, String category, String description, String image, LocalDateTime createdAt) {
         this.title = title;
         this.price = price;
         this.category = category;
@@ -39,4 +39,5 @@ public class Product {
         this.image = image;
         this.createdAt = createdAt;
     }
+
 }

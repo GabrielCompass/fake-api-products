@@ -13,7 +13,6 @@ public class ProductsMapper {
 
     public Product toEntity(ProductsDTO dto) {
         return new Product(
-                dto.id(),
                 dto.title(),
                 dto.price(),
                 dto.category(),
